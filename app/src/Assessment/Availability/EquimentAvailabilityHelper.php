@@ -3,15 +3,18 @@ namespace Assessment\Availability;
 
 use DateTime;
 use PDO;
+use Repository\EquipmentRepository;
 
 abstract class EquipmentAvailabilityHelper {
 
+	protected EquipmentRepository $equipmentRepository;
+	
 	/**
 	 * EquipmentAvailabilityHelper constructor.
 	 * @param PDO $oDatabaseConnection
 	 */
 	public function __construct(private PDO $oDatabaseConnection) {
-
+		$this->equipmentRepository = new EquipmentRepository($this->getDatabaseConnection());
 	}
 
 	/**

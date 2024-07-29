@@ -1,4 +1,5 @@
 <?php
+
 namespace Repository;
 
 use DateTime;
@@ -73,23 +74,33 @@ class EquipmentRepository
         return $result['total_quantity'] ?? 0;
     }
 
+
+
     /**
-     * Get the planned quantities and stock of all equipment items in a given timeframe.
+     * Get shortages of equipment within a specified timeframe.
      *
-     * @param DateTime $start The start datetime of the timeframe.
-     * @param DateTime $end   The end datetime of the timeframe.
-     * @return array An array of associative arrays, each containing equipment ID, total planned quantity, and stock.
+     * This method returns the equipment items that have shortages within the given timeframe.
+     * An item is considered to have a shortage if the total planned quantity exceeds the stock.
+     *
+     * @param DateTime $start The start of the timeframe.
+     * @param DateTime $end The end of the timeframe.
+     * @return array An associative array where the keys are equipment IDs and the values are the shortages.
      */
-    public function getEquipmentPlannedInPeriod(DateTime $start, DateTime $end): array
+    public function getShortages(DateTime $start, DateTime $end): array
     {
         // Query to get the total planned quantities and stock of equipment in the specified timeframe
-        $query = "
-            SELECT p.equipment, SUM(p.quantity) AS total_quantity, e.stock
-            FROM planning p
-            JOIN equipment e ON p.equipment = e.id
-            WHERE (p.start < :end AND p.end > :start)
-            GROUP BY p.equipment, e.stock
-        ";
+        $query = " SELECT equipment.id as id, (stock -(SELECT SUM(quantity)
+                                                        FROM
+                                                            planning
+                                                        WHERE
+                                                            equipment = equipment.id AND(
+                                                                start < :end AND end > :start)
+                                                        )
+                                                  ) AS shortage
+                    FROM
+                        equipment
+                    HAVING shortage < 0";
+                    
         $stmt = $this->db->prepare($query);
         $stmt->execute([
             ':start' => $start->format('Y-m-d H:i:s'),
@@ -100,4 +111,3 @@ class EquipmentRepository
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
-

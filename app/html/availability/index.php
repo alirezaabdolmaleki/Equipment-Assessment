@@ -7,9 +7,9 @@ include "../../bootstrap.php";
 
 try {
     
-    $db = Database::getInstance()->getConnection();
+    $oDatabaseConnection = Database::getInstance()->getConnection();
 
-    $oAssessment = new EquipmentAvailabilityHelperAssessment($db);
+    $oAssessment = new EquipmentAvailabilityHelperAssessment($oDatabaseConnection);
 
     //check if form is submitted
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {

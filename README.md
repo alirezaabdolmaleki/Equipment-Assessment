@@ -19,7 +19,7 @@ The project is structured to use the Repository design pattern for efficient dat
    - Handles database interactions related to equipment and planning:
      - `getStock(int $equipment_id): int`: Retrieves the stock quantity of a specific equipment item by its ID.
      - `getTotalPlanned(int $equipment_id, DateTime $start, DateTime $end): int`: Retrieves the total quantity of equipment planned in the specified timeframe.
-     - `getEquipmentPlannedInPeriod(DateTime $start, DateTime $end): array`: Retrieves the planned quantities and stock of all equipment items in the given timeframe.
+     - `getShortages(DateTime $start, DateTime $end): array`: Get shortages of equipment within a specified timeframe.
 
 3. **Database**
    - Uses the Singleton design pattern to ensure a single instance of the database connection throughout the application.
