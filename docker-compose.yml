@@ -1,0 +1,55 @@
+version: '2.2'
+
+services:
+  # The webserver
+  sarmayex-assessments-web:
+    image: sarmayex/assessments
+    build:
+      context: ./
+      dockerfile: ./deployment/dockerfiles/sarmayex-assessments-web/Dockerfile
+    ports:
+      - "7000:80"
+    volumes:
+      - ./app:/var/www
+    env_file:
+      - ./deployment/env/environment.env
+    networks:
+      - sarmayex-assessments-network
+
+  sarmayex-assessments-db:
+    image: mysql:8
+    ports:
+      - 3307:3306
+    volumes:
+      - ./deployment/assets/mysql/assessment.sql:/docker-entrypoint-initdb.d/assessment.sql
+      - .docker/db/data:/var/lib/mysql
+      - ./deployment/assets/mysql/config-file.cnf:/etc/mysql/conf.d/config-file.cnf
+    env_file:
+      - ./deployment/env/environment.env
+    # restart: always
+    networks:
+      - sarmayex-assessments-network
+  composer:
+    restart: 'no'
+    image: composer:2
+    command: install
+    volumes:
+      - ./app:/app
+
+  sarmayex-assessments-phpmyadmin:
+    image: 'phpmyadmin/phpmyadmin:5.0'
+    ports:
+    - "7001:80"
+    env_file:
+      - ./deployment/env/environment.env
+    
+    restart: always
+    networks:
+      - sarmayex-assessments-network
+
+networks:
+  sarmayex-assessments-network:
+    name: sarmayex-assessments-network
+
+volumes:
+  sarmayex-assessments-db-volume:
