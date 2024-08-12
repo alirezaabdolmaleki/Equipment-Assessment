@@ -77,7 +77,7 @@ class EquipmentRepository
 
 
     /**
-     * Get shortages of equipment within a specified timeframe.
+     * Find shortages of equipment within a specified timeframe.
      *
      * This method returns the equipment items that have shortages within the given timeframe.
      * An item is considered to have a shortage if the total planned quantity exceeds the stock.
@@ -86,20 +86,18 @@ class EquipmentRepository
      * @param DateTime $end The end of the timeframe.
      * @return array An associative array where the keys are equipment IDs and the values are the shortages.
      */
-    public function getShortages(DateTime $start, DateTime $end): array
+    public function findShortages(DateTime $start, DateTime $end): array
     {
+        print_r($start) ;
+        print_r($end);
         // Query to get the total planned quantities and stock of equipment in the specified timeframe
-        $query = " SELECT equipment.id as id, (stock -(SELECT SUM(quantity)
-                                                        FROM
-                                                            planning
-                                                        WHERE
-                                                            equipment = equipment.id AND(
-                                                                start < :end AND end > :start)
-                                                        )
-                                                  ) AS shortage
-                    FROM
-                        equipment
-                    HAVING shortage < 0";
+        $query = "SELECT equipment.id as id, 
+        (stock - getMaxPlanned(equipment.id,:start,:end))
+        
+         AS shortage FROM equipment HAVING shortage < 0
+    
+        
+      ";
                     
         $stmt = $this->db->prepare($query);
         $stmt->execute([

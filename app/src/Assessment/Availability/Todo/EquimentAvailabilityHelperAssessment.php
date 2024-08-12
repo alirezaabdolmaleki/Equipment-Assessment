@@ -37,8 +37,8 @@ class EquipmentAvailabilityHelperAssessment extends EquipmentAvailabilityHelper
      */
     public function getShortages(DateTime $start, DateTime $end): array
     {
-        // Call the getShortages method from the EquipmentRepository to get the shortages within the specified timeframe
-        $results = $this->equipmentRepository->getShortages($start, $end);
+        // Call the findShortages method from the EquipmentRepository to get the shortages within the specified timeframe
+        $results = $this->equipmentRepository->findShortages($start, $end);
 
         // Initialize an empty array to store the shortages
         $shortages = array();
